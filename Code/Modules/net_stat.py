@@ -11,7 +11,8 @@ import random
 import networkx as nx
 import netrd
 
-import Modules.network_construction as constr
+import Modules.net_construction as constr
+
 
 def prenet_NM(etho_obj, seed=None, nb_iter=1000):
     """Builds a list of adjacency matrices of random networks according to the pre-network Null Model.

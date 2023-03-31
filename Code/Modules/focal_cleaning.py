@@ -716,10 +716,11 @@ class Focals:
                     axs[0].hist(nv_table.loc[:, 'focal_length'])
                     axs[0].set_title('Focal lengths', fontdict={'fontsize': 8})
                     axs[1].hist(nv_table.loc[:, 'diff'])
-                    axs[1].set_title('After non-visible removal' , fontdict={'fontsize': 8})
+                    axs[1].set_title('After non-visible removal',
+                                     fontdict={'fontsize': 8})
                     axs[2].hist(nv_table.loc[:, 'diff2'])
                     axs[2].set_title(
-                        'After corrected non-visible removal', fontdict={'fontsize': 8})
+                        'After corr. non-visible removal', fontdict={'fontsize': 8})
                     plt.show()
                     # Input given by the user.
                     non_visible_method = int(input(
@@ -802,21 +803,26 @@ class Focals:
                 nb_focal_ind = dict.values(
                     Counter(data.groupby('numfocal').first().loc[:, 'Subject']))
                 # The individual length is calculated.
-                time_indiv = data.groupby('Observation id').first().groupby('Subject').sum(numeric_only = True).loc[:,'focal_length']
+                time_indiv = data.groupby('numfocal').first().groupby('Subject').sum(numeric_only = True).loc[:,'focal_length']
                 # The focal lengths are retrieved.
                 focal_length = data.groupby('numfocal')['focal_length'].first()
                 # Graphical representation (optional).
                 if see_error == True:
                     fig, axs = plt.subplots(1, 3)
                     axs[0].boxplot(nb_focal_ind)
-                    axs[0].set_title('Number of focal per-individual', fontdict={'fontsize': 8})
+                    axs[0].set_title('Number of focal per indiv',
+                                     fontdict={'fontsize': 8})
                     axs[0].set_xticks([])
+                    axs[0].tick_params(axis='y', which='major', labelsize=7)
                     axs[1].boxplot(time_indiv)
-                    axs[1].set_title("Observation length per each individual", fontdict={'fontsize': 8})
+                    axs[1].set_title(
+                        "Observation length per indiv", fontdict={'fontsize': 8})
                     axs[1].set_xticks([])
+                    axs[1].tick_params(axis='y', which='major', labelsize=7)
                     axs[2].boxplot(focal_length)
                     axs[2].set_title('Focal length', fontdict={'fontsize': 8})
                     axs[2].set_xticks([])
+                    axs[2].tick_params(axis='y', which='major', labelsize= 7)
                     plt.show()
                     short_focal_threshold = input(
                         'what threshold do you want ? ( "None" for no threshold) \n')
@@ -851,3 +857,4 @@ class Focals:
         # If specified, the dataset is saved.
         if save:
             self.data.to_csv(path_or_buf=save)
+            

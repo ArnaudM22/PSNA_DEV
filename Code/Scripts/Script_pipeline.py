@@ -8,11 +8,18 @@ Created on Mon Mar 20 12:17:46 2023
 import pandas as pd
 import Modules.focal_cleaning as clean
 import Modules.focal_parsing as pars
-import Modules.etho as etho
-__author__ = " Arnaud Maupas "
-__contact__ = "arnaud.maupas@ens.fr"
-__date__ = "19/09/22"
-__version__ = "1"
+import Modules.net_construction as constr
+import Modules.net_stat as stat
+import Modules.net_viz as viz
+
+
+
+affiliative_behaviors = ['Grooming', 'Etreinte',
+                             'Jeu social', 'Contact passif']
+directed_behaviors = ['Grooming']
+undirected_behaviors = ['Etreinte', 'Jeu social', 'Contact passif']
+
+    
 
 """
 First step : data cleaning. Example dataset is Tonkean 2021.
@@ -26,15 +33,44 @@ y
 1
 None
 """
-# Tonkean (shown in the report, Figure 7 and 8ABCD)
-tonkean = etho.Focals('../Data/Etho/Raw/Tonkean_2021_2',
+
+tonkean_focals = clean.Focals('../Data/Raw/Tonkean_2021_2',
                       open_preprocessed=False, check_empty_col=True, ignore=())
 
 #Manual adjustment : renommer Groom.er.ee -> Ind
-tonkean.data = tonkean.data.replace('Groom.er.ee','Ind', regex=True)
+tonkean_focals.data = tonkean_focals.data.replace('Groom.er.ee','Ind', regex=True)
 
-tonkean.filtering(grooming_see=True, non_visible_see=True,
+tonkean_focals.filtering(grooming_see=True, non_visible_see=True,
                   short_focal_preprocessing_see=True, save=None, ignore=())
+
+"""data viz"""
+
+viz.visualisation(tonkean_focals, 5, 5)
+
+"""parsing"""
+pars.ind_obs_time(tonkean_focals.data)
+pars.dyad_obs_time(tonkean_focals.data, tonkean_focals.indiv)
+pars.ind_obs_time(tonkean_focals.data)
+pars.tot_obs_time(tonkean_focals.data)
+pars.behav_obs_time(tonkean_focals.data, affiliative_behaviors)
+pars.edge_lists(tonkean_focals.data, directed_behaviors, undirected_behaviors) #edge_list pour les non-orientés : toujours non-symetrique. Pose question de si bien reciproque ?
+pars.adj_table(tonkean_focals.data, directed_behaviors, undirected_behaviors, affiliative_behaviors, tonkean_focals.indiv, undir_adj_table = True)
+behavior_rate_list = pars.table_list(tonkean_focals.data, directed_behaviors, undirected_behaviors, affiliative_behaviors, tonkean_focals.indiv, undir_adj_table = True) #mettre en dict, dissocier les calculs de taux, l'empty diagonal.
+
+"""network construction"""
+behav_obs = pars.behav_obs_time(tonkean_focals.data, affiliative_behaviors)
+tot_obs = pars.tot_obs_time(tonkean_focals.data)
+dsi_tonk = constr.dsi_table(behavior_rate_list, tonkean_focals.indiv, affiliative_behaviors, behav_obs, tot_obs)
+
+
+
+
+pars.length_adj(tonkean_focals.data, tonkean_focals.indiv, tonkean_focals.affiliative_behaviors)
+
+
+"""focal parsing"""
+
+
 
 """
 For the Rhesus 2021 behavioral category correction:
