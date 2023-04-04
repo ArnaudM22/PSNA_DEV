@@ -7,6 +7,7 @@ Created on Mon Mar 20 12:17:46 2023
 
 import pandas as pd
 import Modules.focal_cleaning as clean
+import Modules.class_definition as class_def
 import Modules.focal_parsing as pars
 import Modules.net_construction as constr
 import Modules.net_stat as stat
@@ -34,7 +35,7 @@ y
 None
 """
 
-tonkean_focals = clean.Focals('../Data/Raw/Tonkean_2021_2',
+tonkean_focals = class_def.Focals('../Data/Raw/Tonkean_2021_2',
                       open_preprocessed=False, check_empty_col=True, ignore=())
 
 #Manual adjustment : renommer Groom.er.ee -> Ind
