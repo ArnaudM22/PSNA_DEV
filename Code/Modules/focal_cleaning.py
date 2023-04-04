@@ -587,6 +587,46 @@ def short_focal_preprocessing(data, short_focal_threshold, see_error):
         data = data.drop(check[check].index)
     return data, invalid_focal_length
 
+############
+def social_category(data, affiliative_interactions = [], agonistic_interactions = [], proximity_association = []):
+    #social behavior column
+    #social_behavior = affiliative_interactions + agonistic_interactions + proximity_association
+    data.loc[data['Behavior'].isin(affiliative_interactions), 'Social behavior category'] = 'Affiliative interaction'
+    data.loc[data['Behavior'].isin(agonistic_interactions), 'Social behavior category'] = 'Agonistic interaction'
+    data.loc[data['Behavior'].isin(proximity_association), 'Social behavior category'] = 'Proximity association'
+    data.loc[:, 'Social behavior category'] = data.loc[:,'Social behavior category'].fillna('Non social')
+    return data
+
+def interactor_direction(data, directed_interaction = [], undirected_interaction = [], proximity_association = []):
+    #directed case
+    dir_inter = data.loc[data['Behavior'].isin(directed_interaction), "Modifiers"].str.split('|', expand=True).rename(columns={0: 'Interaction direction', 1: 'Other individual'})
+    data = data.merge(dir_inter, how = 'outer', left_index = True, right_index = True)
+    #undirected case and proximity
+    undir_prox = data.loc[data['Behavior'].isin(undirected_interaction + proximity_association), "Modifiers"]
+    data.loc[undir_prox.index, 'Other individual'] = undir_prox
+    data.loc[data['Behavior'].isin(undirected_interaction), 'Interaction direction'] = 'Undirected interaction'
+    #dealing with nan
+    data.loc[:, 'Interaction direction'] = data.loc[:,'Interaction direction'].fillna('Non-directional') 
+    data.loc[:, 'Other individual'] = data.loc[:,'Other individual'].fillna('No other individual') 
+    return data
+
+def column_reorder(data):
+    raw_col = data.columns.tolist()
+    col_ordered = ['numfocal',
+                   'Subject',
+                   'focal_length',
+                   'Behavior',
+                   'Behavior type',
+                   'Start (s)',
+                   'Stop (s)',
+                   'Duration (s)',
+                   'Social behavior category',
+                   'Interaction direction',
+                   'Other individual']
+    additional_columns = list(set(raw_col) - set(col_ordered))
+    new_col = col_ordered + additional_columns
+    data = data[new_col]
+    return data
 
 
 

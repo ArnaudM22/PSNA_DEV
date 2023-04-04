@@ -15,11 +15,12 @@ import Modules.net_viz as viz
 
 
 
-affiliative_behaviors = ['Grooming', 'Etreinte',
-                             'Jeu social', 'Contact passif']
-directed_behaviors = ['Grooming']
-undirected_behaviors = ['Etreinte', 'Jeu social', 'Contact passif']
-
+affiliative_interactions = ['Grooming', 'Etreinte', 'Jeu social', 'Contact passif']
+proximity_association = ['0. Debut du scan', '1. Contact passif', '2. Espace peripersonnel', '3. peri<...<2m', '4. Prox. 2-5 m']
+agonistic_interactions = []
+directed_interaction = ['Grooming']
+undirected_interaction = ['Etreinte', 'Jeu social', 'Contact passif']
+social_behaviors = affiliative_interactions + agonistic_interactions + proximity_association
     
 
 """
@@ -44,6 +45,10 @@ tonkean_focals.data = tonkean_focals.data.replace('Groom.er.ee','Ind', regex=Tru
 tonkean_focals.filtering(grooming_see=True, non_visible_see=True,
                   short_focal_preprocessing_see=True, save=None, ignore=())
 
+tonkean_focals.data = clean.social_category(tonkean_focals.data, affiliative_interactions = affiliative_interactions, agonistic_interactions = [], proximity_association = proximity_association)
+tonkean_focals.data = clean.interactor_direction(tonkean_focals.data, directed_interaction = directed_interaction, undirected_interaction = undirected_interaction, proximity_association = proximity_association)
+tonkean_focals.data = clean.column_reorder(tonkean_focals.data)
+
 """data viz"""
 
 viz.visualisation(tonkean_focals, 5, 5)
@@ -53,7 +58,7 @@ pars.ind_obs_time(tonkean_focals.data)
 pars.dyad_obs_time(tonkean_focals.data, tonkean_focals.indiv)
 pars.ind_obs_time(tonkean_focals.data)
 pars.tot_obs_time(tonkean_focals.data)
-pars.behav_obs_time(tonkean_focals.data, affiliative_behaviors)
+pars.behav_obs_time(tonkean_focals.data, affiliative_interactions)
 pars.edge_lists(tonkean_focals.data, directed_behaviors, undirected_behaviors) #edge_list pour les non-orientés : toujours non-symetrique. Pose question de si bien reciproque ?
 pars.adj_table(tonkean_focals.data, directed_behaviors, undirected_behaviors, affiliative_behaviors, tonkean_focals.indiv, undir_adj_table = True)
 behavior_rate_list = pars.table_list(tonkean_focals.data, directed_behaviors, undirected_behaviors, affiliative_behaviors, tonkean_focals.indiv, undir_adj_table = True) #mettre en dict, dissocier les calculs de taux, l'empty diagonal.

@@ -27,21 +27,31 @@ def behav_obs_time(data, behavior_list):
         'Behavior')['Duration (s)'].sum()
     return behav_obs
 
+def edge_list2(data, behaviors):
+    dir_adj = pd.DataFrame(data.loc[data['Behavior'].isin(behaviors)].groupby(['Behavior', 'Subject', 'Interaction direction', 'Other individual'])[
+                           'Duration (s)'].sum(numeric_only = True))  # The duration is calculated for each combination of behavior, individual, and modifiers.
+    
+    
 def edge_lists(data, directed_behaviors, undirected_behaviors):
     # Undirected case.
-    undir_adj = pd.DataFrame(data.loc[data['Behavior'].isin(undirected_behaviors)].groupby(['Behavior', 'Subject', 'Modifiers'])[
+    undir_adj = pd.DataFrame(data.loc[data['Behavior'].isin(undirected_behaviors)].groupby(['Behavior', 'Subject', 'Other individual'])[
                              'Duration (s)'].sum(numeric_only = True))  # The duration is calculated for each combination of behavior, individual, and modifiers.
-    undir_adj = undir_adj.merge(pd.Series(undir_adj.index.get_level_values('Modifiers'), index=undir_adj.index).str.split(
+    undir_adj = undir_adj.merge(pd.Series(undir_adj.index.get_level_values('Other individual'), index=undir_adj.index).str.split(
         ',', expand=True), left_index=True, right_index=True)  # The names in the modifiers section are separated.
     undir_adj = undir_adj.replace('NaN', np.nan)
     undir_adj2 = undir_adj.loc[:, ['Duration (s)', 0]].dropna().rename(
-        columns={0: 'Modifiers'})  # undir_adj2 is used for the loop.
+        columns={0: 'Other individual'})  # undir_adj2 is used for the loop.
     # Modifiers correction.
     for i in range(1, len(undir_adj.columns) - 1):
         undir_adj2 = pd.concat((undir_adj2, undir_adj.loc[:, [
-                               'Duration (s)', i]].dropna().rename(columns={i: 'Modifiers'})))
+                               'Duration (s)', i]].dropna().rename(columns={i: 'Other individual'})))
     undir_adj = undir_adj2.set_index(undir_adj2.index.droplevel(2)).groupby(
-        ['Behavior', 'Subject', 'Modifiers']).sum(numeric_only = True)  # Summed values for Modifiers.
+        ['Behavior', 'Subject', 'Other individual']).sum(numeric_only = True)  # Summed values for Modifiers.
+    # Directed case.
+    dir_adj = pd.DataFrame(data.loc[data['Behavior'].isin(directed_behaviors)].groupby(['Behavior', 'Subject', 'Interaction direction', 'Other individual'])[
+                           'Duration (s)'].sum(numeric_only = True))  # The duration is calculated for each combination of behavior, individual, and modifiers.
+    
+    
     # Directed case.
     dir_adj = pd.DataFrame(data.loc[data['Behavior'].isin(directed_behaviors)].groupby(['Behavior', 'Subject', 'Modifiers'])[
                            'Duration (s)'].sum(numeric_only = True))  # The duration is calculated for each combination of behavior, individual, and modifiers.
