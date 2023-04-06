@@ -1,3 +1,6 @@
+
+setwd("C:/Users/arnau/Desktop/StageImalis/PSNA_DEV/Data/Results")
+
 library(muxViz)
 library(igraph)
 library(RColorBrewer)

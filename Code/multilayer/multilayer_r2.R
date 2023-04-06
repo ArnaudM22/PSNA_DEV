@@ -69,25 +69,22 @@ plot_multiplex3D(g.list[c(1,2,3,4)], layer.colors, edge.normalize = T, layer.lab
 #Interlayer correlation and reducibility
 #Edge overlapping
 edge_overlap <- GetAverageGlobalOverlappingMatrix(M,Layers,Nodes)
-edge_overlap.df <- melt(as.matrix(edge_overlap))
-#edge_overlap.df$type <- "Edge overlapping"
 edge_overlap = as.matrix(edge_overlap)
 rownames(edge_overlap) = layerLabels
 colnames(edge_overlap) = layerLabels
-#representations graphiques
-ggplot(data = edge_overlap.df, aes(x=Var1, y=Var2, fill=value)) + 
-  geom_tile()
-heatmap(edge_overlap)
 gplots::heatmap.2(edge_overlap, trace = "none")
-
+#LL.cor1.df <- melt(as.matrix(LL.cor1))
+#LL.cor1.df$type <- "Edge overlapping"
 
 #node strength
-GetMultiStrength(SupraAdjacencyMatrix = M, Layers, Nodes, isDirected = FALSE)
 
 #reducibility
 Method <- "ward.D2" #use Ward linkage for hierarchical clustering
-struct.red = GetMultilayerReducibility(SupraAdjacencyMatrix = M, Layers, Nodes, Method, Type = networkOfLayersType)
-heatmap(as.matrix(struct.red$JSD))
+GetMultilayerReducibility(SupraAdjacencyMatrix = M, Layers, Nodes, Method, Type = networkOfLayersType)
+
+ 
+
+
 gplots::heatmap.2(as.matrix(struct.red$JSD), trace = "none")
 dev.off()
 
