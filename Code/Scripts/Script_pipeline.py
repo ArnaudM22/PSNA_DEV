@@ -21,7 +21,10 @@ agonistic_interactions = []
 directed_interaction = ['Grooming']
 undirected_interaction = ['Etreinte', 'Jeu social', 'Contact passif']
 social_behaviors = affiliative_interactions + agonistic_interactions + proximity_association
-    
+
+
+
+behaviors = affiliative_interactions
 
 """
 First step : data cleaning. Example dataset is Tonkean 2021.
@@ -55,21 +58,30 @@ viz.visualisation(tonkean_focals, 5, 5)
 
 """parsing"""
 pars.ind_obs_time(tonkean_focals.data)
-pars.dyad_obs_time(tonkean_focals.data, tonkean_focals.indiv)
+a = pars.dyad_obs_time(tonkean_focals.data, tonkean_focals.indiv)
 pars.ind_obs_time(tonkean_focals.data)
 pars.tot_obs_time(tonkean_focals.data)
 pars.behav_obs_time(tonkean_focals.data, affiliative_interactions)
-pars.edge_lists(tonkean_focals.data, directed_behaviors, undirected_behaviors) #edge_list pour les non-orientés : toujours non-symetrique. Pose question de si bien reciproque ?
-pars.adj_table(tonkean_focals.data, directed_behaviors, undirected_behaviors, affiliative_behaviors, tonkean_focals.indiv, undir_adj_table = True)
-behavior_rate_list = pars.table_list(tonkean_focals.data, directed_behaviors, undirected_behaviors, affiliative_behaviors, tonkean_focals.indiv, undir_adj_table = True) #mettre en dict, dissocier les calculs de taux, l'empty diagonal.
+pars.edge_list(tonkean_focals.data, social_behaviors) #edge_list pour les non-orientés : toujours non-symetrique. Pose question de si bien reciproque ?
+pars.adj_table(tonkean_focals.data, directed_interaction, social_behaviors, tonkean_focals.indiv, undir_adj_table = True)
+behavior_rate_dict = pars.table_dict(tonkean_focals.data, affiliative_interactions,directed_interaction, social_behaviors, tonkean_focals.indiv, undir_adj_table = True) #mettre en dict, dissocier les calculs de taux, l'empty diagonal.
+
+with pd.ExcelWriter('layers.xlsx') as writer:
+    for df_name, df in behavior_rate_dict.items():
+        df.to_excel(writer, sheet_name=df_name)
+        
+"""look at proximity"""
+#première étape: repets
+prox = tonkean_focals.data
+prox = prox.loc[prox['Social behavior category'] == 'Proximity association']
+scan_count = prox.loc[prox['Behavior'] == '0. Debut du scan']
+scan_count = scan_count.groupby('numfocal').sum('Duration (s)')
 
 """network construction"""
+behavior_rate_list = list(behavior_rate_dict.values())
 behav_obs = pars.behav_obs_time(tonkean_focals.data, affiliative_behaviors)
 tot_obs = pars.tot_obs_time(tonkean_focals.data)
 dsi_tonk = constr.dsi_table(behavior_rate_list, tonkean_focals.indiv, affiliative_behaviors, behav_obs, tot_obs)
-
-
-
 
 pars.length_adj(tonkean_focals.data, tonkean_focals.indiv, tonkean_focals.affiliative_behaviors)
 
