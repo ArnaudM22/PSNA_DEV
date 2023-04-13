@@ -1,5 +1,5 @@
 #devtools::install_github("manlius/muxviz")
-setwd("C:/Users/arnaud.maupas/Desktop")
+setwd("C:/Users/arnau/Desktop/StageImalis/PSNA_dev/Data/Results")
 
 #package loading
 library('muxViz')
@@ -7,6 +7,7 @@ library('readxl')
 library(igraph)
 library(reshape2)
 library(ggplot2)
+library(RColorBrewer)
 
 #data loading
 #layer name
