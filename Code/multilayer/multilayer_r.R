@@ -106,3 +106,8 @@ p <- ggplot(df.quality, aes(step, q)) + theme_bw() +
   xlab("Merging Step, m") + ylab("Quality function, q(m)")
 print(p)
 dev.off()
+
+#####################################
+##correlation and reproducibility##
+
+####Node versatility####

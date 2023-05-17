@@ -5,7 +5,6 @@ Created on Fri Mar 24 12:18:58 2023
 """
 import pandas as pd
 import numpy as np
-import pymnet
 
 
 def dsi_table(adj_list, indiv, affiliative_behaviors, behav_obs, tot_obs):
@@ -18,6 +17,6 @@ def dsi_table(adj_list, indiv, affiliative_behaviors, behav_obs, tot_obs):
     np.fill_diagonal(dsi.values, 0)
     return dsi
 
-#multi-layer
+# multi-layer
 
-#ratio agonistique/affiliatif.
+# ratio agonistique/affiliatif.
