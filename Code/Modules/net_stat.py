@@ -123,6 +123,7 @@ def prenet_NM(etho_obj, seed=None, nb_iter=1000):
 
     return random_adjlist, random_undir_adjlist, random_dsi, random_dir_dsi
 
+
 def indiv_properties(data):
     """Computes properties at the level of individuals and dyads (eigenvector centrality, brokerage and distance).
 
@@ -142,13 +143,25 @@ def indiv_properties(data):
     net = nx.Graph(data)
     # Computation of centrality, brokerage and distance
     prop_dict = {}
-    prop_dict["Centrality"] =  pd.Series(nx.eigenvector_centrality(net)).rename("Centrality")
-    prop_dict["Brokerage"] = 1/pd.Series(nx.constraint(net)).rename("Brokerage")
-    prop_dict["Distance"] = pd.DataFrame(dict(nx.all_pairs_dijkstra_path_length(net)))
+    prop_dict["Centrality"] = pd.Series(
+        nx.eigenvector_centrality(net)).rename("Centrality")
+    prop_dict["Brokerage"] = 1 / \
+        pd.Series(nx.constraint(net)).rename("Brokerage")
+    prop_dict["Distance"] = pd.DataFrame(
+        dict(nx.all_pairs_shortest_path_length(net)))
+    # djikstra
+    net_cost = data.copy(deep=True)
+    net_cost = 1/net_cost[net_cost != 0]
+    net_cost = net_cost.fillna(0)
+    net_cost = nx.Graph(net_cost)
+    prop_dict["Distance_weight"] = pd.DataFrame(
+        dict(nx.all_pairs_dijkstra_path_length(net_cost)))
     # Matrix is set symetrical.
-    prop_dict["Distance"].sort_index(axis = 0, inplace = True)
-    prop_dict["Distance"].sort_index(axis = 1, inplace = True)
-    
+    prop_dict["Distance"].sort_index(axis=0, inplace=True)
+    prop_dict["Distance"].sort_index(axis=1, inplace=True)
+    prop_dict["Distance_weight"].sort_index(axis=0, inplace=True)
+    prop_dict["Distance_weight"].sort_index(axis=1, inplace=True)
+
     return prop_dict
 
 
