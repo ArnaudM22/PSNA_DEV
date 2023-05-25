@@ -18,6 +18,48 @@ __date__ = "19/09/22"
 __version__ = "1"
 
 
+def import_merge(path):
+    # The data is imported, merged.
+    data = pd.concat(map(pd.read_excel, glob.glob(
+        os.path.join(path, '*.xls'))), ignore_index=True)
+    return data
+
+
+def order(data):
+    data = data.sort_values(
+        ["Observation id", "Start (s)"], ignore_index=True)
+    return data
+
+
+def start_end_setting(data, start_end):
+    if start_end == True:
+        str_end_df = data.loc[data['Behavior'] == 'Debut / Fin']
+        str_end_df.loc[:, 'repet'] = (
+            str_end_df.loc[:, 'numfocal'] == str_end_df.loc[:, 'numfocal'].shift(1))
+        index = str_end_df.loc[str_end_df['repet'] == True].index
+        for i in index:
+            data.loc[i:, 'numfocal'] = data.loc[i:, 'numfocal'] + 1
+        # focal length
+        focal_length = data.loc[data['Behavior'] == 'Debut / Fin', [
+            'Duration (s)', 'numfocal']].rename(columns={"Duration (s)": "focal_length"})
+    else:
+        # The focal length is calculated by subtracting the end of the last behavior from the beginning of the first.
+        focal_length = (data.groupby('numfocal').max().loc[:, 'Stop (s)'] - data.groupby(
+            'numfocal').first().loc[:, 'Start (s)']).rename('focal_length', inplace=True)
+    data = data.merge(focal_length, on='numfocal')
+    return data
+
+
+def point_adj(data):
+    # The duration of point behaviors is defined as one second and the 'NaN' are converted to caracter strings.
+    data.loc[data['Behavior type'] == 'POINT', 'Duration (s)'] = 1
+    return data
+
+
+def nan_char(data):
+    data = data.fillna('NaN')
+
+
 def order_data(path, start_end):
     """Import, order the data and perform basic cleaning.
 
@@ -40,7 +82,7 @@ def order_data(path, start_end):
     data : dataframe
         A first version of the dataset.
     """
-    
+
     # The data is imported, merged and then ordered.
     data = pd.concat(map(pd.read_excel, glob.glob(
         os.path.join(path, '*.xls'))), ignore_index=True)
@@ -49,14 +91,16 @@ def order_data(path, start_end):
     # A numerical identifier is assigned to each focal length (2 lines are in the same focal length if they are consecutive with the same observation_id and the same subject).
     data.loc[:, 'numfocal'] = (data.loc[:, ['Observation id', 'Subject']] != data.loc[:, [
                                'Observation id', 'Subject']].shift()).any(axis=1).cumsum() - 1
-    if start_end == True :
+    if start_end == True:
         str_end_df = data.loc[data['Behavior'] == 'Debut / Fin']
-        str_end_df.loc[:,'repet'] = (str_end_df.loc[:, 'numfocal'] == str_end_df.loc[:, 'numfocal'].shift(1))
+        str_end_df.loc[:, 'repet'] = (
+            str_end_df.loc[:, 'numfocal'] == str_end_df.loc[:, 'numfocal'].shift(1))
         index = str_end_df.loc[str_end_df['repet'] == True].index
         for i in index:
-            data.loc[i:,'numfocal'] = data.loc[i:,'numfocal'] + 1
+            data.loc[i:, 'numfocal'] = data.loc[i:, 'numfocal'] + 1
         # focal length
-        focal_length = data.loc[data['Behavior'] == 'Debut / Fin', ['Duration (s)', 'numfocal']].rename(columns={"Duration (s)": "focal_length"})
+        focal_length = data.loc[data['Behavior'] == 'Debut / Fin', [
+            'Duration (s)', 'numfocal']].rename(columns={"Duration (s)": "focal_length"})
     else:
         # The focal length is calculated by subtracting the end of the last behavior from the beginning of the first.
         focal_length = (data.groupby('numfocal').max().loc[:, 'Stop (s)'] - data.groupby(
@@ -66,6 +110,7 @@ def order_data(path, start_end):
     data.loc[data['Behavior type'] == 'POINT', 'Duration (s)'] = 1
     data = data.fillna('NaN')
     return data
+
 
 def correct_behavioral_cat(data, reference_behavior_table):
     """Corrects behavioral categories to align with the reference.
@@ -157,6 +202,7 @@ def correct_behavioral_cat(data, reference_behavior_table):
 
     return data, behavioralcat_change_list
 
+
 def new_behavioral_cat(data):
     """Create the new behavioral categories.
 
@@ -188,7 +234,8 @@ def new_behavioral_cat(data):
                                                     'Behavioral category 2'].fillna('Else')
     return data
 
-def empty_col(data, check = False):
+
+def empty_col(data, check=False):
     """Supress uninformative empty columns.
 
     Allows the user to delete columns often left empty by Strasbourg observers 
@@ -238,7 +285,8 @@ def empty_col(data, check = False):
 
 ##################
 
-def grooming(data, see_error = False, raw_data = None):
+
+def grooming(data, see_error=False, raw_data=None):
     """Reformatting and removal of unnecessary grooming lines.
 
     Because of the possibility of multiple simultaneous observations, 
@@ -260,7 +308,6 @@ def grooming(data, see_error = False, raw_data = None):
     None.
 
     """
-
 
     # Formatting of data in a grooming table (Step1).
     # Columns of interest are maintained.
@@ -410,7 +457,7 @@ def non_visible(data, non_visible_treshold, lag_method, non_visible_method, see_
     -------
     None.
     """
-    
+
     # Analysis of lags within a focal.
     invalid_non_visible = None
     # The basic data are retrieved.
@@ -506,6 +553,7 @@ def non_visible(data, non_visible_treshold, lag_method, non_visible_method, see_
             lambda row: nv_table.loc[row.numfocal, 'diff2'] if row.numfocal in nv_table.index else row.focal_length, axis=1)
     return data, invalid_non_visible
 
+
 def repetition_preprocessing(data):
     """Supress duplicated "5 Proximite" lines. 
 
@@ -556,7 +604,8 @@ def short_focal_preprocessing(data, short_focal_threshold, see_error):
     nb_focal_ind = dict.values(
         Counter(data.groupby('numfocal').first().loc[:, 'Subject']))
     # The individual length is calculated.
-    time_indiv = data.groupby('numfocal').first().groupby('Subject').sum(numeric_only = True).loc[:,'focal_length']
+    time_indiv = data.groupby('numfocal').first().groupby(
+        'Subject').sum(numeric_only=True).loc[:, 'focal_length']
     # The focal lengths are retrieved.
     focal_length = data.groupby('numfocal')['focal_length'].first()
     # Graphical representation (optional).
@@ -575,7 +624,7 @@ def short_focal_preprocessing(data, short_focal_threshold, see_error):
         axs[2].boxplot(focal_length)
         axs[2].set_title('Focal length', fontdict={'fontsize': 8})
         axs[2].set_xticks([])
-        axs[2].tick_params(axis='y', which='major', labelsize= 7)
+        axs[2].tick_params(axis='y', which='major', labelsize=7)
         plt.show()
         short_focal_threshold = input(
             'what threshold do you want ? ( "None" for no threshold) \n')
@@ -588,27 +637,41 @@ def short_focal_preprocessing(data, short_focal_threshold, see_error):
     return data, invalid_focal_length
 
 ############
-def social_category(data, affiliative_interactions = [], agonistic_interactions = [], proximity_association = []):
-    #social behavior column
+
+
+def social_category(data, affiliative_interactions=[], agonistic_interactions=[], proximity_association=[]):
+    # social behavior column
     #social_behavior = affiliative_interactions + agonistic_interactions + proximity_association
-    data.loc[data['Behavior'].isin(affiliative_interactions), 'Social behavior category'] = 'Affiliative interaction'
-    data.loc[data['Behavior'].isin(agonistic_interactions), 'Social behavior category'] = 'Agonistic interaction'
-    data.loc[data['Behavior'].isin(proximity_association), 'Social behavior category'] = 'Proximity association'
-    data.loc[:, 'Social behavior category'] = data.loc[:,'Social behavior category'].fillna('Non social')
+    data.loc[data['Behavior'].isin(
+        affiliative_interactions), 'Social behavior category'] = 'Affiliative interaction'
+    data.loc[data['Behavior'].isin(
+        agonistic_interactions), 'Social behavior category'] = 'Agonistic interaction'
+    data.loc[data['Behavior'].isin(
+        proximity_association), 'Social behavior category'] = 'Proximity association'
+    data.loc[:, 'Social behavior category'] = data.loc[:,
+                                                       'Social behavior category'].fillna('Non social')
     return data
 
-def interactor_direction(data, directed_interaction = [], undirected_interaction = [], proximity_association = []):
-    #directed case
-    dir_inter = data.loc[data['Behavior'].isin(directed_interaction), "Modifiers"].str.split('|', expand=True).rename(columns={0: 'Interaction direction', 1: 'Other individual'})
-    data = data.merge(dir_inter, how = 'outer', left_index = True, right_index = True)
-    #undirected case and proximity
-    undir_prox = data.loc[data['Behavior'].isin(undirected_interaction + proximity_association), "Modifiers"]
+
+def interactor_direction(data, directed_interaction=[], undirected_interaction=[], proximity_association=[]):
+    # directed case
+    dir_inter = data.loc[data['Behavior'].isin(directed_interaction), "Modifiers"].str.split(
+        '|', expand=True).rename(columns={0: 'Interaction direction', 1: 'Other individual'})
+    data = data.merge(dir_inter, how='outer',
+                      left_index=True, right_index=True)
+    # undirected case and proximity
+    undir_prox = data.loc[data['Behavior'].isin(
+        undirected_interaction + proximity_association), "Modifiers"]
     data.loc[undir_prox.index, 'Other individual'] = undir_prox
-    data.loc[data['Behavior'].isin(undirected_interaction), 'Interaction direction'] = 'Undirected interaction'
-    #dealing with nan
-    data.loc[:, 'Interaction direction'] = data.loc[:,'Interaction direction'].fillna('Non-directional') 
-    data.loc[:, 'Other individual'] = data.loc[:,'Other individual'].fillna('No other individual') 
+    data.loc[data['Behavior'].isin(
+        undirected_interaction), 'Interaction direction'] = 'Undirected interaction'
+    # dealing with nan
+    data.loc[:, 'Interaction direction'] = data.loc[:,
+                                                    'Interaction direction'].fillna('Non-directional')
+    data.loc[:, 'Other individual'] = data.loc[:,
+                                               'Other individual'].fillna('No other individual')
     return data
+
 
 def column_reorder(data):
     raw_col = data.columns.tolist()
@@ -627,7 +690,3 @@ def column_reorder(data):
     new_col = col_ordered + additional_columns
     data = data[new_col]
     return data
-
-
-
-

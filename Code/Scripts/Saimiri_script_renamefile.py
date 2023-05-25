@@ -32,7 +32,7 @@ list_name = [ele for ele in list_name if ele != []]
 list_name = sum(list_name, [])
 
 # get the true file name list
-target_path = '../../saimiris/DataCollectionBORIS/Post_Process_xls'
+target_path = 'C:/Users/arnau/Desktop/StageImalis/PSNA_DEV/Data/Raw/Sai_xls_2'
 target_path_list = []
 for file in list_name:
     file_name = os.path.basename(file)
@@ -40,10 +40,10 @@ for file in list_name:
     target_path_list.append(target_name)
 
 # supress hidden file
-list_name[8]
-list_name.pop(8)
-target_path_list[8]
-target_path_list.pop(8)
+# list_name[8]
+# list_name.pop(8)
+# target_path_list[8]
+# target_path_list.pop(8)
 # copy paste files
 for i in range(len(list_name)):
     shutil.copyfile(list_name[i], target_path_list[i])
