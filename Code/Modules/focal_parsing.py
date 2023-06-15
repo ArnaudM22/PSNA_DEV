@@ -50,6 +50,12 @@ def behav_obs_time(data, behavior_list):
     return behav_obs
 
 
+def behav_obs_count(data, behavior_list):
+    behav_obs = data.loc[data['Behavior'].isin(behavior_list)].groupby(
+        'Behavior')['Duration (s)'].count()
+    return behav_obs
+
+
 def edge_list(data, behaviors):
     # Correction des other individual multiples
     inter_list = pd.DataFrame(data.loc[data['Behavior'].isin(behaviors)].groupby(['Behavior', 'Subject', 'Interaction direction', 'Other individual'])[
