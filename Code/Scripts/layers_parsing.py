@@ -4,17 +4,12 @@ Created on Wed May 17 16:38:58 2023
 
 @author: arnau
 """
-import networkx as nx
 import Modules.datastream_viz as viz
 import pandas as pd
 import Modules.focal_parsing as pars
 import Modules.net_construction as constr
-import Modules.net_stat as stat
-import Modules.focal_parsing as pars
-import Modules.net_construction as constr
 import matplotlib.pyplot as plt
 import seaborn
-import Modules.datastream_viz as viz
 
 list_data_sets = ['rhesus_2021', 'tonkean_2021', 'rhesus_2022', 'sai_2023']
 dataset_name = 'sai_2023'
@@ -31,24 +26,21 @@ observer stats for saimiri
 obs = data.groupby('numfocal')['Observer'].first()
 assistant = data.groupby('numfocal')['Assistant'].first()
 """
+#data opening
 data = pd.read_excel('../Data/datastream/' + dataset_name + '.xls')
 data = data.drop(columns=['Unnamed: 0'])
+
+#basic information parsing
 indiv = pars.indiv_list(data)
 affiliative_interactions, proximity_association,  agonistic_interactions, directed_interaction = pars.behaviors_list_def(
     data)
 
+#redefinition for our case.
 directed_interaction = []
 social_behaviors = affiliative_interactions + \
     agonistic_interactions + proximity_association
     
-if dataset_name != 'sai_2023':
-    col_list
-else:
-    col_list = None
-    
-
-
-
+#color definition. 
 if dataset_name == 'sai_2023':
     behav_col = 'Behavior'
     col_list = None
@@ -60,6 +52,7 @@ viz.datastream_viz(data, n_line=6, n_column=4, behav_col=behav_col, col_list = c
 
 
 """parsing"""
+#individual observations.
 ind_obs = pars.ind_obs_time(data)
 ind_obs.plot(kind='bar')
 plt.axhline(13500, color = 'r')
@@ -69,11 +62,13 @@ plt.show()
 seaborn.violinplot(ind_obs)
 plt.axhline(13500, color = 'r')
 plt.show()
+#individual distribution information.
 ind_obs.quantile([0.25,0.5,0.75])
 ind_obs.mean()
 ind_obs.std()
 ind_obs.min()
 ind_obs.max()
+#dyadic observation.
 dyad_obs = pars.dyad_obs_time(data, indiv)
 # autre façon de représenter : reorga avec lignes et colonnes qui ont la somme la plus petite
 mat = dyad_obs.copy(deep=True)
@@ -85,7 +80,9 @@ mat.drop("mean", inplace=True)
 mat.drop("mean", axis=1, inplace=True)
 seaborn.heatmap(mat)
 plt.show()
+#total time.
 tot_time = pars.tot_obs_time(data)
+#sampling informations.
 behav_obs_summary= pd.DataFrame()
 behav_obs_summary.loc[:,'Total duration'] = pars.behav_obs_time(data, affiliative_interactions)
 behav_obs_summary.loc[:,'Total count'] = pars.behav_obs_count(data, affiliative_interactions)
@@ -108,10 +105,12 @@ dsi = constr.dsi_table2(
     behavior_rate_list, indiv, affiliative_interactions, behav_obs_time, tot_obs)
 behavior_rate_dict['dsi'] = dsi
 
-#partie visualisation
+"""
+#partie visualisation clustermap.
 seaborn.clustermap(behavior_rate_dict['Grooming'], method='complete',
                    metric='euclidean', dendrogram_ratio={0, 0.2}, cbar_pos=(0.9, 0.85, 0.05, 0.18),  cmap="Reds")
 plt.show()
+"""
 """save
 with pd.ExcelWriter('../Data/layers_' + dataset_name + '.xlsx') as writer:
     for df_name, df in behavior_rate_dict.items():

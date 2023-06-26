@@ -12,14 +12,8 @@ Created on Fri May 26 16:02:23 2023
 @author: arnau
 """
 import Modules.comparative_stat as comp_stat
-import scipy.stats as stats
-import numpy as np
-import networkx as nx
-import Modules.focal_parsing as pars
-import Modules.net_stat as stat
-import matplotlib.pyplot as plt
-import seaborn
 import pandas as pd
+
 list_data_sets = ['rhesus_2021', 'tonkean_2021', 'rhesus_2022', 'sai_2023']
 dataset_name = 'rhesus_2021'
 dataset_name_plot = 'rhesus_2021'

@@ -14,7 +14,6 @@ Created on Wed May 17 12:23:05 2023
 
 import Modules.focal_cleaning as clean
 import Modules.class_definition as class_def
-import Modules.datastream_viz as viz
 import numpy as np
 affiliative_interactions = ['Grooming',
                             'Etreinte', 'Jeu social', 'Contact passif']

@@ -81,14 +81,3 @@ data = pd.read_excel('../Data/layers/layers_rhesus_2022.xlsx', 'Grooming', index
 for indiv in ['Theoden', 'Spliff', 'Vladimir', 'Yvan']:
     RDM(data,indiv , plot=True)
 
-dict_prop = net.indiv_properties(data)
-seaborn.clustermap(dict_prop['Distance'], method='complete',
-                   metric='euclidean', dendrogram_ratio={0, 0.2}, cbar_pos=(0.9, 0.85, 0.05, 0.18),  cmap="Reds")
-plt.show()
-seaborn.clustermap(dict_prop['Distance_weight'], method='complete',
-                   metric='euclidean', dendrogram_ratio={0, 0.2}, cbar_pos=(0.9, 0.85, 0.05, 0.18),  cmap="Reds")
-
-seaborn.clustermap(dict_prop['Distance'], method='complete',
-                   metric='euclidean', dendrogram_ratio={0, 0.2}, cbar_pos=(0.9, 0.85, 0.05, 0.18),  cmap="Reds")
-
-hud.to_excel('hud_non_oriented.xls')
