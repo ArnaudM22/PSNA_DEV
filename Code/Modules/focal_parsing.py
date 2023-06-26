@@ -38,7 +38,7 @@ def tot_obs_time(data):
 
 def dyad_obs_time(data, indiv_list):
     ind_obs = ind_obs_time(data)
-    dyad_obs_time = pd.DataFrame(0, index=indiv_list, columns=indiv_list)
+    dyad_obs_time = pd.DataFrame(0, index=sorted(indiv_list), columns=sorted(indiv_list))
     for i in range(len(dyad_obs_time)):
         dyad_obs_time.iloc[i] = ind_obs + ind_obs.iloc[i]
     return dyad_obs_time

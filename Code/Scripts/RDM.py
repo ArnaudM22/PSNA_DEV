@@ -49,6 +49,7 @@ def RDM(dataframe, indiv, plot=True):
     RDM_dict = net.indiv_properties(dataframe)
     # recuperer distance par rapport à individu
     RDM_dict["Distance"] = RDM_dict["Distance"].loc[:, indiv]
+    RDM_dict["Distance_weight"] = RDM_dict["Distance_weight"].loc[:, indiv]
     # enlever individu du jeu de donnée
     RDM_dict = {k: v.drop(indiv) for k, v in RDM_dict.items()}
     # remplacer par z-scored pairwise matrix
@@ -74,7 +75,13 @@ def RDM(dataframe, indiv, plot=True):
     return RDM_dict
 
 
-dict_prop = net.indiv_properties(hud)
+# ouverture jeu de données:
+data = pd.read_excel('../Data/layers/layers_rhesus_2022.xlsx', 'Grooming', index_col = 'Other individual')
+
+for indiv in ['Theoden', 'Spliff', 'Vladimir', 'Yvan']:
+    RDM(data,indiv , plot=True)
+
+dict_prop = net.indiv_properties(data)
 seaborn.clustermap(dict_prop['Distance'], method='complete',
                    metric='euclidean', dendrogram_ratio={0, 0.2}, cbar_pos=(0.9, 0.85, 0.05, 0.18),  cmap="Reds")
 plt.show()

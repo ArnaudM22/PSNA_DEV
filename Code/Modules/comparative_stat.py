@@ -85,6 +85,7 @@ def comparative_pipeline(data_dict, dataset_name, dataset_name_plot, affiliative
         # modularity
         commu = nx.community.greedy_modularity_communities(
             data, weight='weight')
+        n_subgroup = len(commu)
         modu = nx.community.modularity(
             data, communities=commu, weight='weight', resolution=1)
         # assortativity
@@ -108,9 +109,9 @@ def comparative_pipeline(data_dict, dataset_name, dataset_name_plot, affiliative
 
         # sortir une série avec toutes ces valeurs.
         value_list = [group_size, dens, diam,
-                      cluster_ratio, skew_strength, var_vert_strength, modu, assortativity]
+                      cluster_ratio, skew_strength, var_vert_strength, n_subgroup, modu, assortativity]
         index_list = ['group size', 'density', 'diameter', 'clustering ratio',
-                      'strength skewness', 'vertex strength variance', 'modularity', 'strength assortativity']
+                      'strength skewness', 'vertex strength variance', 'number of subgroups', 'modularity', 'strength assortativity']
         layer_data = pd.Series(
             data=value_list, index=index_list, name=layer_name)
 

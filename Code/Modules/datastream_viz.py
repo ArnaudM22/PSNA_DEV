@@ -7,6 +7,9 @@ Created on Wed May 17 13:28:01 2023
 import pandas as pd
 import matplotlib.pyplot as plt
 from collections import Counter
+import matplotlib.colors as mcolors
+import random
+import Modules.legend_plot as leg_plt
 
 
 def behavior_table_construction(data, see_table):
@@ -207,4 +210,68 @@ def visible_lags(data):
         between_lines.loc[between_lines['Behavior'] != 'Non-visible', 'lag'].dropna())
     plt.title('"Visible observation" lags')
     plt.xticks([])
+    plt.show()
+
+def datastream_viz(data, n_line, n_column, behav_col='Behavior', col_list=None):
+    # liste de comportements d'interet
+    behav_li = sorted(list(dict.fromkeys(data.loc[:, behav_col])))
+    if col_list == None:
+        # random choice of colors
+        col_list = list(mcolors.CSS4_COLORS.values())
+        random.shuffle(col_list)
+        col_list[:len(behav_li)]
+    col_dict = {behav_li[i]: col_list[i] for i in range(len(behav_li))}
+    # plot legend
+    leg_plt.plot_colortable(col_dict, ncols=3, sort_colors=False)
+    plt.show()
+    # The data and individual list are charged in local variables to facilitate debugging.
+    indiv = sorted(tuple(dict.fromkeys(data.loc[:, 'Subject'])))
+
+    # A "plot_data" table is initialized.
+    iterables = [list(dict.fromkeys(data.loc[:, 'numfocal'])), list(
+        dict.fromkeys(data.loc[:, behav_col]))]  # Index content.
+    # Index initialization.
+    index = pd.MultiIndex.from_product(
+        iterables, names=['numfocal', behav_col])
+    plot_data = pd.DataFrame(index=index)  # initialiser dataframe
+    # The data to plot are calculated.
+    # Number of occurence.
+    nbr_occur = data.groupby(
+        ['numfocal', behav_col]).size().rename('nbr_occur')
+    # Table filling.
+    plot_data = plot_data.merge(
+        nbr_occur, right_index=True, left_index=True, how='left')
+    plot_data = plot_data.merge(data.groupby('numfocal')['Subject'].first(
+    ), on='numfocal', how='left').set_axis(plot_data.index)  # Individual ID is added.
+    plot_data = plot_data.fillna(0)  # Nan are replaced by 0.
+    # Individual ID is set as an index level.
+    plot_data = plot_data.set_index('Subject', append=True)
+    # The data for the stacked bar plot are calculated.
+    plot_indiv_data = plot_data.groupby(
+        ['Subject', behav_col]).sum()  # on somme
+    # For pei charts
+    plt.rcParams.update({'font.size': 8,
+                         'axes.titlepad': 0})
+    plot_indiv_data = plot_indiv_data.unstack(level=0)
+    plot_indiv_data.plot(kind='pie', subplots=True, layout=(
+        n_line, n_column), legend=False, sharex=False, labels=None, title=indiv, ylabel='', colors=col_list)  # plot pour indiv
+    plt.rcParams.update(plt.rcParamsDefault)
+    # For stacked bar plots.
+    fig, axs = plt.subplots(n_line, n_column)
+    l = 0
+    for a in range(n_line):
+        for b in range(n_column):
+            if l < (len(indiv)):
+                plot_data2 = plot_data.loc[plot_data.index.get_level_values(
+                    'Subject') == indiv[l]].unstack(level=1)
+                plot_data2.plot(
+                    ax=axs[a, b], kind='bar', stacked=True, legend=False, xlabel='', fontsize=2, color=col_list)  # Plot construction.
+                # xticks Parameters.
+                axs[a, b].tick_params(
+                    axis='both', labelbottom=False, bottom=False, which='major', pad=0)
+                # Title parameters.
+                axs[a, b].set_title(indiv[l], pad=0, fontsize=10)
+                l += 1
+            else:
+                axs[a, b].axis('off')
     plt.show()

@@ -21,8 +21,8 @@ import matplotlib.pyplot as plt
 import seaborn
 import pandas as pd
 list_data_sets = ['rhesus_2021', 'tonkean_2021', 'rhesus_2022', 'sai_2023']
-dataset_name = 'rhesus_2022'
-dataset_name_plot = 'rhesus 2022'
+dataset_name = 'rhesus_2021'
+dataset_name_plot = 'rhesus_2021'
 #####
 
 if dataset_name == 'sai_2023':
