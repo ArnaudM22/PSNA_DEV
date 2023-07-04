@@ -81,3 +81,12 @@ data = pd.read_excel('../Data/layers/layers_rhesus_2022.xlsx', 'Grooming', index
 for indiv in ['Theoden', 'Spliff', 'Vladimir', 'Yvan']:
     RDM(data,indiv , plot=True)
 
+
+Yvan_rdm = RDM(data, 'Yvan' , plot=True)
+
+
+# recuperer propriétés individuelles
+RDM_dict = net.indiv_properties(data)
+# recuperer distance par rapport à individu
+RDM_dict["Distance"]
+RDM_dict["Distance_weight"]

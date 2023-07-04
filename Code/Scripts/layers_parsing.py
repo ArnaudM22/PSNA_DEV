@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import seaborn
 
 list_data_sets = ['rhesus_2021', 'tonkean_2021', 'rhesus_2022', 'sai_2023']
-dataset_name = 'sai_2023'
+dataset_name = 'rhesus_2022'
 
 
 """
