@@ -258,49 +258,52 @@ layer.colors <- brewer.pal(3, "Set1")
 plot_multiplex(g.list, layer.colors, edge.colors = "auto", node.colors = "auto",
                node.size.values = 0.5, node.alpha = 1, edge.alpha = 1, layout = "fr", show.legend = T)
 plotmultiplex3D2(g.list, layer.colors, edge.normalize = T, layer.labels = layerLabels, edge.colors = "grey0",edge.size.scale = 2, layer.labels.cex = 1,5 , node.colors	= "grey0",node.size.values = 2, show.nodeLabels = F)
-plot_multiplex3D(g.list, layer.colors, edge.normalize = T, layer.labels = layerLabels, edge.colors = "grey0",edge.size.scale = 2, layer.labels.cex = 1,5 , node.colors	= "grey0",node.size.values = 2, show.nodeLabels = F)
-plotmultiplex3D2(g.list, layer.colors, edge.normalize = T, layer.labels = layerLabels, edge.colors = "grey0",edge.size.scale = 2, layer.labels.cex = 1,5 , node.colors	= "grey0",node.size.values = 2, show.nodeLabels = F)
-#Interlayer correlation and reducibility
-#Edge overlapping
-edge_overlap <- GetAverageGlobalOverlappingMatrix(M,Layers,Nodes)
-edge_overlap.df <- melt(as.matrix(edge_overlap))
-#edge_overlap.df$type <- "Edge overlapping"
-edge_overlap = as.matrix(edge_overlap)
-rownames(edge_overlap) = layerLabels
-colnames(edge_overlap) = layerLabels
-#representations graphiques
-ggplot(data = edge_overlap.df, aes(x=Var1, y=Var2, fill=value)) + 
-  geom_tile()
-heatmap(edge_overlap)
-gplots::heatmap.2(edge_overlap, trace = "none")
 
 
-#node strength
-GetMultiStrength(SupraAdjacencyMatrix = M, Layers, Nodes, isDirected = FALSE)
-
-#reducibility
-Method <- "ward.D2" #use Ward linkage for hierarchical clustering
-struct.red = GetMultilayerReducibility(SupraAdjacencyMatrix = M, Layers, Nodes, Method, Type = networkOfLayersType)
-heatmap(as.matrix(struct.red$JSD))
-gplots::heatmap.2(as.matrix(struct.red$JSD), trace = "none")
-dev.off()
-
-df.quality <-
-  data.frame(step = 0:(length(struct.red$relgQualityFunction) - 1),
-             q = struct.red$relgQualityFunction)
-png(
-  "mux_structural_reducibility_quality.png",
-  width = 1024,
-  height = 1024 * 0.5,
-  res = 120
-)
-p <- ggplot(df.quality, aes(step, q)) + theme_bw() +
-  geom_line(color = "steelblue") + geom_point(color = "steelblue") +
-  xlab("Merging Step, m") + ylab("Quality function, q(m)")
-print(p)
-dev.off()
-
-#####################################
-##correlation and reproducibility##
-
-####Node versatility####
+#plot_multiplex3D(g.list, layer.colors, edge.normalize = T, layer.labels = layerLabels, edge.colors = "grey0",edge.size.scale = 2, layer.labels.cex = 1,5 , node.colors	= "grey0",node.size.values = 2, show.nodeLabels = F)
+#plotmultiplex3D2(g.list, layer.colors, edge.normalize = T, layer.labels = layerLabels, edge.colors = "grey0",edge.size.scale = 2, layer.labels.cex = 1,5 , node.colors	= "grey0",node.size.values = 2, show.nodeLabels = F)
+# 
+# #Interlayer correlation and reducibility
+# #Edge overlapping
+# edge_overlap <- GetAverageGlobalOverlappingMatrix(M,Layers,Nodes)
+# edge_overlap.df <- melt(as.matrix(edge_overlap))
+# #edge_overlap.df$type <- "Edge overlapping"
+# edge_overlap = as.matrix(edge_overlap)
+# rownames(edge_overlap) = layerLabels
+# colnames(edge_overlap) = layerLabels
+# #representations graphiques
+# ggplot(data = edge_overlap.df, aes(x=Var1, y=Var2, fill=value)) + 
+#   geom_tile()
+# heatmap(edge_overlap)
+# gplots::heatmap.2(edge_overlap, trace = "none")
+# 
+# 
+# #node strength
+# GetMultiStrength(SupraAdjacencyMatrix = M, Layers, Nodes, isDirected = FALSE)
+# 
+# #reducibility
+# Method <- "ward.D2" #use Ward linkage for hierarchical clustering
+# struct.red = GetMultilayerReducibility(SupraAdjacencyMatrix = M, Layers, Nodes, Method, Type = networkOfLayersType)
+# heatmap(as.matrix(struct.red$JSD))
+# gplots::heatmap.2(as.matrix(struct.red$JSD), trace = "none")
+# dev.off()
+# 
+# df.quality <-
+#   data.frame(step = 0:(length(struct.red$relgQualityFunction) - 1),
+#              q = struct.red$relgQualityFunction)
+# png(
+#   "mux_structural_reducibility_quality.png",
+#   width = 1024,
+#   height = 1024 * 0.5,
+#   res = 120
+# )
+# p <- ggplot(df.quality, aes(step, q)) + theme_bw() +
+#   geom_line(color = "steelblue") + geom_point(color = "steelblue") +
+#   xlab("Merging Step, m") + ylab("Quality function, q(m)")
+# print(p)
+# dev.off()
+# 
+# #####################################
+# ##correlation and reproducibility##
+# 
+# ####Node versatility####

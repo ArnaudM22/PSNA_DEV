@@ -6,12 +6,6 @@ Created on Mon Apr  3 14:36:42 2023
 """
 
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import re
-import os
-import glob
-from collections import Counter
 
 import Modules.focal_cleaning as clean
 __author__ = " Arnaud Maupas "
